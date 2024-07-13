@@ -1,0 +1,45 @@
+pip install gensim nltk
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import string
+
+
+nltk.download('punkt')
+nltk.download('stopwords')
+
+documents = [
+    "I love machine learning. Its applications are vast and amazing.",
+    "Natural language processing is a fascinating field.",
+    "Deep learning is a branch of machine learning.",
+    "There are many machine learning algorithms such as regression, classification, and clustering."
+]
+
+
+stop_words = set(stopwords.words('english'))
+punctuation = set(string.punctuation)
+
+def preprocess(doc):
+    tokens = word_tokenize(doc.lower())
+    tokens = [word for word in tokens if word.isalpha() and word not in stop_words and word not in punctuation]
+    return ' '.join(tokens)
+
+processed_docs = [preprocess(doc) for doc in documents]
+
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(processed_docs)
+
+
+num_clusters = 2
+kmeans = KMeans(n_clusters=num_clusters, random_state=42)
+kmeans.fit(X)
+
+
+print("Cluster centers:")
+print(kmeans.cluster_centers_)
+
+print("\nDocument clusters:")
+for i, label in enumerate(kmeans.labels_):
+    print(f"Document {i} is in cluster {label}")
